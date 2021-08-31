@@ -17,8 +17,3 @@ for i in list(perm):
     list_.append(x)
 list_.sort()
 print(list_[idx-1])
-# %%
-
-
-def perm(x):
-    
