@@ -16,63 +16,45 @@ recurring cycle.
 
 Find the value of d < 1000 for which 1/d contains the longest recurring cycle in its decimal fraction part.
 '''
-
 # %%
-def reccurring_length(d, x):
-    first_entry = x[2]
-    i = 1
-    len_ = 0
-    try:
-        for i, char in enumerate(str(x)):
-            if i>2:
-                if first_entry != char and first_entry != str(x)[-1]:
-                    len_ += 1
-                    
-                else:
-                    upper_bound = 3 + len_
-                    deg_ = x[2: upper_bound]
-                    return {"digit": d, "rec_deg": deg_, "cycle_size": len_ + 1 }
-    except IndexError as error:
-        return None
 
 
-def rec(d):
-    x = str(1/d)
+def reciprocal_cycles(a, b):
+    # list to store dict of current_value & remainder
+    cvars = []
+    current_value = a // b
+    remainder = a % b
+    subset = {f"{current_value}": remainder}
+    while subset not in cvars:
+        cvars.append(subset)
+        current_value = remainder*10 // b
+        remainder = remainder*10 % b
+        subset = {f"{current_value}": remainder}
+        if remainder == 0:
+            return {"cycle": "", "len": 0}
 
-    for char in x[2:]:
-        J = reccurring_length(d, x)
-        if  J is not None:
-            return J
-        else:
-            idx = x.find(char)
-    return "No recurring cycle"
-
-
-#%%
-def longest_rec_cycle(n):
-    longest_cycle = {"digit": None,'rec_deg': '', 'cycle_size': 0}
-    for i in range(1,n + 1):
-        y = rec(i)
-        if type(y) == dict:
-            if longest_cycle.get('cycle_size') <= y.get('cycle_size'):
-                longest_cycle = y 
-                
-    return longest_cycle
-
-
-
-
+    last_remainder = list(cvars[-1].values())[0]
+    for dict_ in cvars[::-1][1:]:
+        remainder = list(dict_.values())[0]
+        if remainder == last_remainder:
+            cycle_len = cvars[::-1][1:].index(dict_) + 1
+            cycle = [
+                list(x.keys())[0] for x in cvars[::-1][:cycle_len]
+            ]
+            cycle_str = ''.join(cycle)
+            return {"cycle": cycle_str[::-1], "len": cycle_len}
 
 
-    
+def max_cycle(m):
+    max_len = 0
+    max_rc = {}
+    for n in range(1, m):
+        rc = reciprocal_cycles(1, n)
+        if rc.get("len") > max_len:
+            max_len = rc.get("len")
+            max_rc = rc
+            max_rc["denominator"] = n
+    return max_rc
 
 
-
-        
-
-
-    
-
-
-
-# %%
+max_cycle(1000)
